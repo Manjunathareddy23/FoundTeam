@@ -1,21 +1,26 @@
 import streamlit as st
-import google.generativeai as genai
-import validators
-import requests
-import git
-import shutil
 import os
 import tempfile
 import pandas as pd
 import numpy as np
+from dotenv import load_dotenv
 from pygments.lexers import get_lexer_for_filename
 from reportlab.pdfgen import canvas
-from dotenv import load_dotenv
+import validators
+import requests
+import shutil
 
 # Load environment variables
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+# Check if the environment variable is loaded correctly
+if not GEMINI_API_KEY:
+    st.error("GEMINI_API_KEY not found in .env file.")
+    st.stop()
+
+# Initialize AI API
+import google.generativeai as genai
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Tailwind CSS for UI Styling
@@ -36,10 +41,13 @@ repo_url = st.text_input("🔗 Enter GitHub Repo URL:")
 if st.button("Analyze Repository"):
     if validators.url(repo_url) and "github.com" in repo_url:
         with st.spinner("Cloning repository..."):
+            # Create a temporary directory
             temp_dir = tempfile.mkdtemp()
             repo_name = repo_url.split('/')[-1].replace('.git', '')
             repo_path = os.path.join(temp_dir, repo_name)
-            git.Repo.clone_from(repo_url, repo_path)
+
+            # Use system command to clone the repository
+            os.system(f"git clone {repo_url} {repo_path}")
             
             # Analyze Code Files
             scores = []
@@ -86,4 +94,3 @@ if st.button("Analyze Repository"):
             shutil.rmtree(temp_dir)
     else:
         st.error("Invalid GitHub URL. Please enter a valid repository link.")
- 
