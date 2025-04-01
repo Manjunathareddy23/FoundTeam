@@ -65,7 +65,7 @@ if st.button("Analyze Repository"):
                             response = model.generate_content(prompt)
                             
                             # Check if response contains valid content
-                            if response.finish_reason == 'stop' and response.text:
+                            if hasattr(response, 'text') and response.text.strip():
                                 score = np.random.randint(60, 100)  # Mock Score for simplicity
                                 report_data.append([file, score, response.text])
                                 scores.append(score)
