@@ -1,7 +1,10 @@
 streamlit
-google-generativeai
 pandas
 numpy
+shutil
+requests
 validators
-reportlab
 python-dotenv
+reportlab
+google-generativeai
+GitPython
