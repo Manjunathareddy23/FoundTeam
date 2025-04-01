@@ -1,0 +1,13 @@
+streamlit
+google-generativeai
+validators
+requests
+gitpython
+shutil
+os
+tempfile
+pandas
+numpy
+pygments
+reportlab
+python-dotenv
