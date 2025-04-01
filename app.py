@@ -63,15 +63,22 @@ if st.button("Analyze Repository"):
                             prompt = f"Analyze this code for correctness, efficiency, and best practices:\n\n{code}"
                             model = genai.GenerativeModel("gemini-1.5-flash")
                             response = model.generate_content(prompt)
-                            score = np.random.randint(60, 100)  # Mock Score for simplicity
                             
-                            report_data.append([file, score, response.text])
-                            scores.append(score)
+                            # Check if response contains valid content
+                            if response.finish_reason == 'stop' and response.text:
+                                score = np.random.randint(60, 100)  # Mock Score for simplicity
+                                report_data.append([file, score, response.text])
+                                scores.append(score)
+                            else:
+                                # Log the invalid response (optional) and continue
+                                st.warning(f"Skipping {file} due to invalid response or copyrighted content.")
+                                report_data.append([file, None, "Invalid or blocked response due to copyrighted content."])
+                                scores.append(None)
                     except Exception as e:
                         st.error(f"Error analyzing {file}: {e}")
             
             # Calculate overall score
-            overall_score = np.mean(scores) if scores else 0
+            overall_score = np.mean([score for score in scores if score is not None]) if scores else 0
             
             # Convert to DataFrame
             df = pd.DataFrame(report_data, columns=["File Name", "Accuracy Score", "AI Analysis"])
