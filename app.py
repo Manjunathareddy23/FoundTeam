@@ -11,7 +11,6 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import simpleSplit
 import google.generativeai as genai
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load environment variables
 load_dotenv()
@@ -135,13 +134,6 @@ def analyze_repo(repo_url):
     except Exception as e:
         st.error(f"Error analyzing {repo_url}: {e}")
 
-# Process multiple URLs asynchronously
-def analyze_multiple_repos(urls):
-    with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(analyze_repo, url) for url in urls]
-        for future in as_completed(futures):
-            future.result()
-
 # Process repositories when the button is clicked
 if st.button("Analyze Repositories"):
     if repo_urls:
@@ -150,7 +142,8 @@ if st.button("Analyze Repositories"):
         
         if valid_urls:
             with st.spinner(f"Cloning and analyzing {len(valid_urls)} repositories..."):
-                analyze_multiple_repos(valid_urls)
+                for url in valid_urls:
+                    analyze_repo(url)
         else:
             st.error("Please enter valid GitHub URLs.")
     else:
